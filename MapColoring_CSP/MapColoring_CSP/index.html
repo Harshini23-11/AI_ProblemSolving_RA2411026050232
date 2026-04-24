@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #18181f;
+    --surface2: #22222c;
+    --border: rgba(255,255,255,0.08);
+    --accent: #7c6af7;
+    --accent2: #e05b8b;
+    --text: #e8e6f0;
+    --muted: #7a7890;
+    --success: #52d9a4;
+    --font-display: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    grid-template-rows: auto 1fr;
+    min-height: 100vh;
+    gap: 0;
+  }
+
+  .header {
+    grid-column: 1 / -1;
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+  }
+
+  .header h1 {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .badge {
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+  }
+
+  .panel {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    overflow-y: auto;
+  }
+
+  .section-title {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+  }
+
+  .field-group { display: flex; flex-direction: column; gap: 8px; }
+
+  .input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  input[type="text"] {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 8px 12px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus { border-color: var(--accent); }
+  input[type="text"]::placeholder { color: var(--muted); }
+
+  .btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    width: 100%;
+    padding: 12px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+  .btn-primary:hover { background: #6a58e5; border-color: #6a58e5; }
+
+  .btn-ghost {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 16px;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 6px;
+    line-height: 1;
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--accent2); }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 32px;
+  }
+
+  .tag {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: border-color 0.2s;
+  }
+
+  .tag .remove {
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .tag .remove:hover { color: var(--accent2); }
+
+  .adj-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: var(--font-mono);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .adj-edge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text);
+  }
+
+  .adj-edge .node-a { color: var(--accent); font-weight: 500; }
+  .adj-edge .node-b { color: var(--accent2); font-weight: 500; }
+  .adj-edge .dash { color: var(--muted); }
+
+  select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 8px 10px;
+    width: 100%;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+  }
+  select:focus { border-color: var(--accent); }
+
+  .select-wrap { position: relative; flex: 1; }
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+    font-size: 12px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 -20px;
+  }
+
+  .canvas-area {
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .canvas-toolbar {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+  }
+  .status-dot.solved { background: var(--success); box-shadow: 0 0 8px var(--success); }
+  .status-dot.error { background: var(--accent2); }
+
+  canvas {
+    display: block;
+    width: 100%;
+    flex: 1;
+    cursor: grab;
+  }
+  canvas:active { cursor: grabbing; }
+
+  .result-panel {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    min-width: 200px;
+    max-width: 260px;
+    backdrop-filter: blur(8px);
+  }
+
+  .result-panel h3 {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+  }
+
+  .result-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-row:last-child { border-bottom: none; }
+
+  .result-region {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .result-color-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .no-solution {
+    color: var(--accent2);
+    font-size: 12px;
+    font-family: var(--font-mono);
+    padding: 4px 0;
+  }
+
+  .hint {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--muted);
+    padding: 8px 10px;
+    background: var(--surface2);
+    border-radius: 6px;
+    line-height: 1.6;
+  }
+
+  .step-counter {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .color-swatch {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  .preset-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 4px 9px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <div style="font-size:20px">🗺️</div>
+    <h1>Map Coloring</h1>
+    <div class="badge">CSP · BACKTRACKING</div>
+  </div>
+
+  <!-- Left Panel -->
+  <div class="panel">
+
+    <!-- Regions -->
+    <div class="field-group">
+      <div class="section-title">Regions</div>
+      <div class="input-row">
+        <input type="text" id="region-input" placeholder="e.g. A or West" maxlength="16"/>
+        <button class="btn" onclick="addRegion()">Add</button>
+      </div>
+      <div class="tag-list" id="region-list"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Adjacency -->
+    <div class="field-group">
+      <div class="section-title">Adjacency (neighbors)</div>
+      <div class="input-row">
+        <div class="select-wrap">
+          <select id="adj-a"></select>
+        </div>
+        <span style="color:var(--muted);font-size:18px;flex-shrink:0">⟷</span>
+        <div class="select-wrap">
+          <select id="adj-b"></select>
+        </div>
+        <button class="btn" onclick="addEdge()">Add</button>
+      </div>
+      <div id="adj-list" style="display:flex;flex-direction:column;gap:5px;"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Colors -->
+    <div class="field-group">
+      <div class="section-title">Available Colors</div>
+      <div class="input-row">
+        <input type="text" id="color-input" placeholder="e.g. Red or #ff0000"/>
+        <button class="btn" onclick="addColor()">Add</button>
+      </div>
+      <div class="tag-list" id="color-list"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Presets -->
+    <div class="field-group">
+      <div class="section-title">Presets</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="preset-btn" onclick="loadPreset('australia')">🌏 Australia</button>
+        <button class="preset-btn" onclick="loadPreset('usa')">🇺🇸 USA (mini)</button>
+        <button class="preset-btn" onclick="loadPreset('simple')">🔷 Simple</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Solve -->
+    <button class="btn-primary" onclick="solve()">▶ Solve with Backtracking</button>
+    <button class="btn" style="font-size:11px;color:var(--muted);" onclick="resetAll()">↩ Reset All</button>
+
+    <div class="hint" id="hint-text">
+      Add regions, connect them as neighbors, choose colors, then press Solve.
+    </div>
+
+  </div>
+
+  <!-- Canvas Area -->
+  <div class="canvas-area">
+    <div class="canvas-toolbar">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Ready</span>
+      <span class="step-counter" id="step-counter"></span>
+    </div>
+    <canvas id="canvas"></canvas>
+    <div class="result-panel" id="result-panel" style="display:none;">
+      <h3>Color Assignment</h3>
+      <div id="result-rows"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── State ─────────────────────────────────────────────────────────────────
+let regions = [];
+let edges = [];   // {a, b}
+let colors = ['Red', 'Green', 'Blue', 'Yellow'];
+let solution = null;
+let nodePositions = {};
+let steps = 0;
+
+// ─── Named color map ────────────────────────────────────────────────────────
+const COLOR_PALETTE = {
+  'Red':    '#e84040', 'Green':  '#38c57a', 'Blue':   '#4a88f5',
+  'Yellow': '#f5c842', 'Orange': '#f08430', 'Purple': '#8f5cf6',
+  'Pink':   '#e05b8b', 'Teal':   '#38b8b8', 'Cyan':   '#38c8e8',
+  'Lime':   '#8ec840', 'Indigo': '#5568e8', 'Brown':  '#a0684a',
+  'Gray':   '#9090a8', 'Coral':  '#f06850', 'Mint':   '#52d9a4',
+};
+
+function resolveColor(c) {
+  if (COLOR_PALETTE[c]) return COLOR_PALETTE[c];
+  if (c.startsWith('#') || c.startsWith('rgb')) return c;
+  const el = document.createElement('div');
+  el.style.color = c;
+  document.body.appendChild(el);
+  const v = getComputedStyle(el).color;
+  document.body.removeChild(el);
+  return v || '#888';
+}
+
+function colorContrast(hex) {
+  // Returns black or white for readable text on a given bg
+  let c = hex.replace('#','');
+  if (c.length === 3) c = c.split('').map(x=>x+x).join('');
+  const r = parseInt(c.substr(0,2),16);
+  const g = parseInt(c.substr(2,2),16);
+  const b = parseInt(c.substr(4,2),16);
+  const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+  return lum > 0.5 ? '#1a1a2e' : '#fff';
+}
+
+// ─── Region management ──────────────────────────────────────────────────────
+function addRegion(name) {
+  const inp = document.getElementById('region-input');
+  const val = (name || inp.value).trim().toUpperCase();
+  if (!val) return;
+  if (regions.includes(val)) { inp.value=''; return; }
+  regions.push(val);
+  inp.value = '';
+  renderRegions();
+  updateSelects();
+  drawGraph();
+}
+
+function removeRegion(r) {
+  regions = regions.filter(x => x !== r);
+  edges = edges.filter(e => e.a !== r && e.b !== r);
+  delete nodePositions[r];
+  renderRegions();
+  updateSelects();
+  renderEdges();
+  drawGraph();
+}
+
+function renderRegions() {
+  const list = document.getElementById('region-list');
+  list.innerHTML = regions.map(r =>
+    `<div class="tag"><span>${r}</span><span class="remove" onclick="removeRegion('${r}')">×</span></div>`
+  ).join('');
+}
+
+// ─── Edge management ────────────────────────────────────────────────────────
+function addEdge() {
+  const a = document.getElementById('adj-a').value;
+  const b = document.getElementById('adj-b').value;
+  if (!a || !b || a === b) return;
+  if (edges.some(e => (e.a===a&&e.b===b)||(e.a===b&&e.b===a))) return;
+  edges.push({a, b});
+  renderEdges();
+  drawGraph();
+}
+
+function removeEdge(i) {
+  edges.splice(i, 1);
+  renderEdges();
+  drawGraph();
+}
+
+function renderEdges() {
+  const list = document.getElementById('adj-list');
+  list.innerHTML = edges.map((e,i) =>
+    `<div class="adj-item">
+      <div class="adj-edge">
+        <span class="node-a">${e.a}</span>
+        <span class="dash">—</span>
+        <span class="node-b">${e.b}</span>
+      </div>
+      <button class="btn-ghost" onclick="removeEdge(${i})">×</button>
+    </div>`
+  ).join('');
+}
+
+function updateSelects() {
+  ['adj-a','adj-b'].forEach(id => {
+    const sel = document.getElementById(id);
+    const prev = sel.value;
+    sel.innerHTML = regions.map(r => `<option value="${r}">${r}</option>`).join('');
+    if (regions.includes(prev)) sel.value = prev;
+  });
+}
+
+// ─── Color management ───────────────────────────────────────────────────────
+function addColor(c) {
+  const inp = document.getElementById('color-input');
+  const val = c || inp.value.trim();
+  if (!val) return;
+  const norm = val.charAt(0).toUpperCase() + val.slice(1);
+  if (colors.includes(norm)) { inp.value=''; return; }
+  colors.push(norm);
+  inp.value = '';
+  renderColors();
+}
+
+function removeColor(c) {
+  colors = colors.filter(x => x !== c);
+  renderColors();
+}
+
+function renderColors() {
+  const list = document.getElementById('color-list');
+  list.innerHTML = colors.map(c => {
+    const hex = resolveColor(c);
+    return `<div class="tag" style="border-color:${hex}33;">
+      <span class="color-swatch" style="background:${hex}"></span>
+      <span>${c}</span>
+      <span class="remove" onclick="removeColor('${c}')">×</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── CSP Backtracking Solver ────────────────────────────────────────────────
+/**
+ * CSP Map Coloring Solver using Backtracking + Forward Checking (MRV heuristic)
+ *
+ * - Variables: regions
+ * - Domains: available colors for each region
+ * - Constraints: adjacent regions must have different colors
+ * - Heuristic: Minimum Remaining Values (MRV) — choose variable with fewest legal values
+ */
+function buildAdjacency() {
+  const adj = {};
+  regions.forEach(r => adj[r] = new Set());
+  edges.forEach(({a,b}) => { adj[a].add(b); adj[b].add(a); });
+  return adj;
+}
+
+function isConsistent(region, color, assignment, adj) {
+  for (const neighbor of adj[region]) {
+    if (assignment[neighbor] === color) return false;
+  }
+  return true;
+}
+
+function selectUnassignedVariable(assignment, domains) {
+  // MRV: pick variable with fewest remaining values
+  let best = null, bestCount = Infinity;
+  for (const r of regions) {
+    if (!(r in assignment)) {
+      const count = domains[r].length;
+      if (count < bestCount) { bestCount = count; best = r; }
+    }
+  }
+  return best;
+}
+
+function forwardCheck(region, color, domains, adj) {
+  // Remove `color` from neighbors' domains; return false if any domain goes empty
+  const removed = {};
+  for (const neighbor of adj[region]) {
+    if (domains[neighbor] && domains[neighbor].includes(color)) {
+      if (!removed[neighbor]) removed[neighbor] = [];
+      removed[neighbor].push(color);
+      domains[neighbor] = domains[neighbor].filter(c => c !== color);
+      if (domains[neighbor].length === 0) return { ok: false, removed };
+    }
+  }
+  return { ok: true, removed };
+}
+
+function restoreDomains(removed, domains) {
+  for (const [r, cols] of Object.entries(removed)) {
+    domains[r] = [...domains[r], ...cols];
+  }
+}
+
+function backtrack(assignment, domains, adj) {
+  steps++;
+  if (Object.keys(assignment).length === regions.length) return assignment;
+
+  const region = selectUnassignedVariable(assignment, domains);
+  if (!region) return null;
+
+  for (const color of [...domains[region]]) {
+    if (isConsistent(region, color, assignment, adj)) {
+      assignment[region] = color;
+      const domainsCopy = {};
+      regions.forEach(r => domainsCopy[r] = [...domains[r]]);
+      const { ok, removed } = forwardCheck(region, color, domainsCopy, adj);
+      if (ok) {
+        const result = backtrack(assignment, domainsCopy, adj);
+        if (result) return result;
+      }
+      delete assignment[region];
+      restoreDomains(removed, domainsCopy);
+    }
+  }
+  return null;
+}
+
+function solve() {
+  solution = null;
+  steps = 0;
+
+  if (regions.length === 0) { setStatus('error', 'Add some regions first.'); return; }
+  if (colors.length === 0) { setStatus('error', 'Add some colors first.'); return; }
+
+  const adj = buildAdjacency();
+  const domains = {};
+  regions.forEach(r => domains[r] = [...colors]);
+
+  const result = backtrack({}, domains, adj);
+
+  document.getElementById('step-counter').textContent = `${steps} steps`;
+
+  if (result) {
+    solution = result;
+    setStatus('solved', `Solved with ${new Set(Object.values(result)).size} colors used`);
+    showResults(result);
+    drawGraph(result);
+  } else {
+    setStatus('error', `No solution found — try adding more colors`);
+    document.getElementById('result-panel').style.display = 'none';
+    drawGraph(null);
+  }
+}
+
+function setStatus(type, msg) {
+  const dot = document.getElementById('status-dot');
+  dot.className = 'status-dot ' + (type === 'solved' ? 'solved' : type === 'error' ? 'error' : '');
+  document.getElementById('status-text').textContent = msg;
+  document.getElementById('hint-text').textContent =
+    type === 'solved' ? `✓ All adjacent regions have different colors. Used ${steps} backtracking steps.` :
+    type === 'error'  ? msg :
+    'Add regions, connect them as neighbors, choose colors, then press Solve.';
+}
+
+function showResults(result) {
+  const panel = document.getElementById('result-panel');
+  const rows = document.getElementById('result-rows');
+  rows.innerHTML = Object.entries(result).map(([r, c]) => {
+    const hex = resolveColor(c);
+    const fg = colorContrast(hex);
+    return `<div class="result-row">
+      <span class="result-region">${r}</span>
+      <span class="result-color-badge" style="background:${hex};color:${fg};">${c}</span>
+    </div>`;
+  }).join('');
+  panel.style.display = 'block';
+}
+
+// ─── Canvas / Graph Drawing ─────────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let dpr = window.devicePixelRatio || 1;
+
+function resizeCanvas() {
+  const area = canvas.parentElement;
+  const w = area.clientWidth;
+  const h = area.clientHeight - 44; // toolbar height
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  ctx.scale(dpr, dpr);
+  layoutNodes(w, h);
+  drawGraph(solution);
+}
+
+function layoutNodes(w, h) {
+  const n = regions.length;
+  if (n === 0) return;
+  const cx = w / 2, cy = h / 2;
+  const r = Math.min(cx, cy) * 0.62;
+  regions.forEach((reg, i) => {
+    if (!nodePositions[reg]) {
+      // Arrange in a circle
+      const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+      nodePositions[reg] = { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+    }
+  });
+}
+
+function drawGraph(result) {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  ctx.clearRect(0, 0, w, h);
+
+  if (regions.length === 0) {
+    ctx.fillStyle = 'rgba(255,255,255,0.07)';
+    ctx.font = '14px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('Add regions to see the graph', w/2, h/2);
+    return;
+  }
+
+  // Draw edges
+  edges.forEach(({a,b}) => {
+    const pa = nodePositions[a], pb = nodePositions[b];
+    if (!pa || !pb) return;
+    ctx.beginPath();
+    ctx.moveTo(pa.x, pa.y);
+    ctx.lineTo(pb.x, pb.y);
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+
+  // Draw nodes
+  const nodeR = Math.max(22, Math.min(38, 160 / Math.max(regions.length, 1)));
+
+  regions.forEach(reg => {
+    const pos = nodePositions[reg];
+    if (!pos) return;
+    const color = result ? resolveColor(result[reg]) : null;
+
+    // Glow if colored
+    if (color) {
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, nodeR + 8, 0, Math.PI * 2);
+      const grad = ctx.createRadialGradient(pos.x, pos.y, nodeR, pos.x, pos.y, nodeR + 10);
+      grad.addColorStop(0, color + '55');
+      grad.addColorStop(1, color + '00');
+      ctx.fillStyle = grad;
+      ctx.fill();
+    }
+
+    // Node circle
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, nodeR, 0, Math.PI * 2);
+    ctx.fillStyle = color || '#22222c';
+    ctx.fill();
+    ctx.strokeStyle = color ? color : 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = color ? 2.5 : 1.5;
+    ctx.stroke();
+
+    // Label
+    const fg = color ? colorContrast(color) : '#e8e6f0';
+    ctx.fillStyle = fg;
+    ctx.font = `600 ${Math.round(nodeR * 0.55)}px Syne, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(reg, pos.x, pos.y);
+  });
+}
+
+// ─── Drag nodes ─────────────────────────────────────────────────────────────
+let dragging = null, dragOffX = 0, dragOffY = 0;
+
+canvas.addEventListener('mousedown', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const nodeR = Math.max(22, Math.min(38, 160 / Math.max(regions.length,1)));
+  for (const reg of regions) {
+    const p = nodePositions[reg];
+    if (p && Math.hypot(mx - p.x, my - p.y) < nodeR + 5) {
+      dragging = reg; dragOffX = mx - p.x; dragOffY = my - p.y; break;
+    }
+  }
+});
+canvas.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  const rect = canvas.getBoundingClientRect();
+  nodePositions[dragging] = {
+    x: e.clientX - rect.left - dragOffX,
+    y: e.clientY - rect.top  - dragOffY
+  };
+  drawGraph(solution);
+});
+canvas.addEventListener('mouseup', () => { dragging = null; });
+canvas.addEventListener('mouseleave', () => { dragging = null; });
+
+// ─── Keyboard shortcuts ──────────────────────────────────────────────────────
+document.getElementById('region-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addRegion();
+});
+document.getElementById('color-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addColor();
+});
+
+// ─── Presets ────────────────────────────────────────────────────────────────
+function loadPreset(name) {
+  resetAll();
+  const presets = {
+    simple: {
+      regions: ['A','B','C','D','E'],
+      edges: [['A','B'],['A','C'],['B','C'],['B','D'],['C','D'],['C','E'],['D','E']],
+      colors: ['Red','Green','Blue']
+    },
+    australia: {
+      regions: ['WA','NT','SA','QLD','NSW','VIC','TAS'],
+      edges: [['WA','NT'],['WA','SA'],['NT','SA'],['NT','QLD'],['SA','QLD'],
+              ['SA','NSW'],['SA','VIC'],['QLD','NSW'],['NSW','VIC'],['VIC','TAS']],
+      colors: ['Red','Green','Blue','Yellow']
+    },
+    usa: {
+      regions: ['WA','OR','CA','NV','AZ','ID','MT','WY','UT','CO','NM'],
+      edges: [['WA','OR'],['WA','ID'],['OR','ID'],['OR','CA'],['OR','NV'],
+              ['CA','NV'],['CA','AZ'],['NV','AZ'],['NV','UT'],['NV','ID'],
+              ['ID','MT'],['ID','WY'],['ID','UT'],['MT','WY'],['WY','UT'],
+              ['WY','CO'],['UT','CO'],['UT','AZ'],['CO','NM'],['AZ','NM']],
+      colors: ['Red','Green','Blue','Yellow']
+    }
+  };
+  const p = presets[name];
+  if (!p) return;
+  p.regions.forEach(r => { regions.push(r); });
+  p.colors.forEach(c => { if (!colors.includes(c)) colors.push(c); });
+  p.edges.forEach(([a,b]) => edges.push({a,b}));
+  renderRegions(); updateSelects(); renderEdges(); renderColors();
+  resizeCanvas();
+  setStatus('', 'Preset loaded — press Solve!');
+}
+
+// ─── Reset ───────────────────────────────────────────────────────────────────
+function resetAll() {
+  regions = []; edges = []; colors = ['Red','Green','Blue','Yellow'];
+  solution = null; nodePositions = {}; steps = 0;
+  renderRegions(); updateSelects(); renderEdges(); renderColors();
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('step-counter').textContent = '';
+  setStatus('', 'Ready');
+  resizeCanvas();
+}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+renderColors();
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// Load simple preset by default
+loadPreset('simple');
+</script>
+</body>
+</html>
